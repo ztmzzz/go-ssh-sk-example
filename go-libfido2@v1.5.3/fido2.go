@@ -158,6 +158,8 @@ type Assertion struct {
 	HMACSecret   []byte
 	CredentialID []byte
 	User         User
+	Counter      uint32
+	Flags        byte
 }
 
 func extensionsInt(extensions []Extension) int {
@@ -732,6 +734,9 @@ func (d *Device) Assertion(
 	// cUserDisplayName := C.fido_assert_user_display_name(cAssert, cIdx)
 	// cUserIcon := C.fido_assert_user_icon(cAssert, cIdx)
 
+	counter := uint32(C.fido_assert_sigcount(cAssert, 0))
+	flags := byte(C.fido_assert_flags(cAssert, 0))
+
 	assertion := &Assertion{
 		AuthDataCBOR: authDataCBOR,
 		HMACSecret:   hmacSecret,
@@ -743,6 +748,8 @@ func (d *Device) Assertion(
 			// 	DisplayName: C.GoString(cUserDisplayName),
 			// 	Icon:        C.GoString(cUserIcon),
 		},
+		Counter: counter,
+		Flags:   flags,
 	}
 
 	return assertion, nil

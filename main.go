@@ -12,9 +12,17 @@ const keyPath = "/home/xxx/.ssh/id_ed25519_sk"
 
 func main() {
 	privateKeyFile, _ := os.ReadFile(keyPath)
-	singer, err := ssh.ParsePrivateKey(privateKeyFile)
+	privateKey, err := ParseRawPrivateKey(privateKeyFile)
 	if err != nil {
 		log.Fatalf("parse private key failed: %v", err)
+	}
+	key, _ := privateKey.(SKEd25519PrivateKey)
+	singer := &SkEd25519PrivateKey{
+		Pub:         key.SkEd25519PublicKey,
+		Application: key.Application,
+		Flags:       key.Flags,
+		Keyhandle:   key.Keyhandle,
+		Reserved:    key.Reserved,
 	}
 
 	config := &ssh.ClientConfig{
